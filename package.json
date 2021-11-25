@@ -1,10 +1,11 @@
 {
-  "name": "dcc-rules-generator",
+  "name": "dcc-rules-generator-app",
   "version": "0.1.0",
   "dependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "dcc-rules-generator": "^0.1.0"
   },
   "scripts": {
     "dev": "BROWSER=none react-scripts start",

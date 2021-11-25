@@ -2,6 +2,8 @@ import React from "react"
 import {useState} from "react"
 import ReactDOM from "react-dom"
 
+import {generateRulesFrom, validateSpecificationAgainstSchema} from "dcc-rules-generator"
+
 
 const pretty = (json) => JSON.stringify(json, null, 2)
 
@@ -31,8 +33,16 @@ const App = () => {
     const spec = tryParse(specAsText)
     const specIsJson = !(spec instanceof Error)
     const validationErrors = specIsJson
-        ? []
-        : [ { spec, message: `Could not parse specification text as JSON: ${spec.message}.` } ]
+        ? validateSpecificationAgainstSchema(spec)
+        : `Could not parse specification text as JSON: ${spec.message}.`
+
+    const [beenShared, setBeenShared] = useState(false)
+    const copyShareableUrlToClipboard = async () => {
+        const params = new URLSearchParams()
+        params.append("spec", specAsText)
+        await navigator.clipboard.writeText(`${location.origin}/?${params}`)
+        setBeenShared(true)
+    }
 
     return <main>
         <h1>DCC Rules Generator</h1>
@@ -46,9 +56,26 @@ const App = () => {
             </div>
             <div>
                 <span className="label">Validation errors</span>
-                {validationErrors.length === 0 && <p>(None.)</p>}
-                {validationErrors.length === 1 && <p>{validationErrors[0].message}</p>}
-                {validationErrors.length > 1 && <ol>{validationErrors.map((error, index) => <li key={index}>{error.message}</li>)}</ol>}
+                {validationErrors === null && <p>(None.)</p>}
+                {validationErrors !== null && <p>{validationErrors}</p>}
+            </div>
+            <div>
+                <button onClick={copyShareableUrlToClipboard}>Copy shareable URL to clipboard</button>
+                <span
+                    className={"push-right " + (beenShared ? "fade-out" : "hidden")}
+                    onAnimationEnd={() => {
+                        setBeenShared(false)
+                    }}
+                >Copied!</span>
+            </div>
+            <div></div>
+            <div>
+                {validationErrors === null &&
+                    <div>
+                        <span className="label">Generated rules</span>
+                        <pre>{pretty(Object.values(generateRulesFrom(spec)))}</pre>
+                    </div>
+                }
             </div>
         </div>
         <p>
