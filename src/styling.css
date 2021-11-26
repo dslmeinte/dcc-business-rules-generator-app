@@ -26,6 +26,7 @@ h1 {
 pre {
     font-family: Menlo, Monaco, "Lucida Console", "Fira Code", "Courier New", monospace, serif;
     white-space: pre-wrap;
+    font-size: 8pt;
 }
 
 textarea {

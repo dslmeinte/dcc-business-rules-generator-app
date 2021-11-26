@@ -1,26 +1,10 @@
 import React from "react"
 import {useState} from "react"
 import ReactDOM from "react-dom"
-
 import {generateRulesFrom, validateSpecificationAgainstSchema} from "dcc-rules-generator"
 
-
-const pretty = (json) => JSON.stringify(json, null, 2)
-
-const tryParse = (text) => {
-    try {
-        return JSON.parse(text)
-    } catch (e) {
-        return e
-    }
-}
-
-
-const ReactiveTextArea = ({ id, value, setter }) =>
-    <textarea
-        id={id}
-        onChange={(event) => setter(event.target.value)}
-        value={value} />
+import {pretty, tryParse} from "./json-utils"
+import {downloadBlob, ReactiveTextArea} from "./ui-utils"
 
 
 import "./styling.css"
@@ -32,9 +16,10 @@ const App = () => {
 
     const spec = tryParse(specAsText)
     const specIsJson = !(spec instanceof Error)
-    const validationErrors = specIsJson
+    const specValidationErrors = specIsJson
         ? validateSpecificationAgainstSchema(spec)
         : `Could not parse specification text as JSON: ${spec.message}.`
+    const specIsValid = specValidationErrors === null
 
     const [beenShared, setBeenShared] = useState(false)
     const copyShareableUrlToClipboard = async () => {
@@ -42,6 +27,15 @@ const App = () => {
         params.append("spec", specAsText)
         await navigator.clipboard.writeText(`${location.origin}/?${params}`)
         setBeenShared(true)
+    }
+
+    const generatedRulesAsText = specIsValid && pretty(Object.values(generateRulesFrom(spec)))
+    const generatedRulesAsBlob = specIsValid && new Blob([ generatedRulesAsText ], { type: "application/json" })
+
+    const [beenDownloaded, setBeenDownloaded] = useState(false)
+    const downloadGeneratedRules = async () => {
+        downloadBlob(generatedRulesAsBlob, "tests.json")
+        setBeenDownloaded(true)
     }
 
     return <main>
@@ -56,8 +50,7 @@ const App = () => {
             </div>
             <div>
                 <span className="label">Validation errors</span>
-                {validationErrors === null && <p>(None.)</p>}
-                {validationErrors !== null && <p>{validationErrors}</p>}
+                <p>{specIsValid ? "(None.)" : specValidationErrors}</p>
             </div>
             <div>
                 <button onClick={copyShareableUrlToClipboard}>Copy shareable URL to clipboard</button>
@@ -70,10 +63,24 @@ const App = () => {
             </div>
             <div></div>
             <div>
-                {validationErrors === null &&
+                {specIsValid &&
+                    <div>
+                        <button onClick={downloadGeneratedRules}>Download generated rules</button>
+                        <span
+                            className={"push-right " + (beenDownloaded ? "fade-out" : "hidden")}
+                            onAnimationEnd={() => {
+                                setBeenDownloaded(false)
+                            }}
+                        >Downloaded!</span>
+                    </div>
+                }
+            </div>
+            <div></div>
+            <div>
+                {specIsValid &&
                     <div>
                         <span className="label">Generated rules</span>
-                        <pre>{pretty(Object.values(generateRulesFrom(spec)))}</pre>
+                        <pre>{generatedRulesAsText}</pre>
                     </div>
                 }
             </div>
