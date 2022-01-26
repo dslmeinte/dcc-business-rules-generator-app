@@ -2,10 +2,10 @@
   "name": "dcc-rules-generator-app",
   "version": "0.1.0",
   "dependencies": {
+    "dcc-business-rules-generator": "^0.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "dcc-rules-generator": "^0.1.1"
+    "react-scripts": "4.0.3"
   },
   "scripts": {
     "dev": "BROWSER=none react-scripts start",
@@ -24,6 +24,6 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dslmeinte/dcc-rules-generator.git"
+    "url": "git+https://github.com/dslmeinte/dcc-business-rules-generator-app.git"
   }
 }
