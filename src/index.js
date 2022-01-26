@@ -39,7 +39,7 @@ const App = () => {
     }
 
     return <main>
-        <h1>DCC Rules Generator</h1>
+        <h1>DCC Business Rules Generator</h1>
         <p>
             Write a specification for DCC validation/business rules, specifically for vaccinations, and generate the corresponding rules.
         </p>
